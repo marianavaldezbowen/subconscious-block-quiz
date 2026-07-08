@@ -40,8 +40,19 @@
 
   .topbar {
     display: flex;
-    justify-content: flex-end;
+    flex-direction: column;
+    align-items: flex-end;
     margin-bottom: 24px;
+  }
+
+  .topbar.hidden { display: none; }
+
+  .lang-label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--sage);
+    margin-bottom: 6px;
   }
 
   .lang-toggle {
@@ -55,13 +66,13 @@
     border: none;
     background: transparent;
     font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 700;
-    letter-spacing: 0.04em;
-    padding: 6px 16px;
+    letter-spacing: 0.02em;
+    padding: 8px 18px;
     cursor: pointer;
     color: var(--deep);
-    opacity: 0.5;
+    opacity: 0.55;
   }
 
   .lang-toggle button.active {
@@ -303,10 +314,11 @@
 
 <div class="wrap">
 
-  <div class="topbar">
+  <div class="topbar" id="topbar">
+    <div class="lang-label" data-i18n="intro.langLabel">Choose your language</div>
     <div class="lang-toggle">
-      <button id="lang-en" class="active" onclick="setLang('en')">EN</button>
-      <button id="lang-es" onclick="setLang('es')">ES</button>
+      <button id="lang-en" class="active" onclick="setLang('en')">English</button>
+      <button id="lang-es" onclick="setLang('es')">Español</button>
     </div>
   </div>
 
@@ -379,15 +391,22 @@ fbq('track', 'PageView');
   emailjs.init({ publicKey: "Hbh_HwtgRTKQhMroG" });
 
   const EMAILJS_SERVICE_ID = "service_tpldbbn";
-  // TODO Mariana: create a new EmailJS template for this notification email
-  // (see README-setup.md) and paste its ID below.
+  // Notifies Mariana when someone completes the quiz.
   const EMAILJS_NOTIFY_TEMPLATE_ID = "template_i4uv22r";
+  // TODO Mariana: create a second EmailJS template — this one sends the quiz
+  // taker their own result. See README-setup.md for the exact fields to use.
+  const EMAILJS_AUTOREPLY_TEMPLATE_ID = "template_03nwoq5";
 </script>
 
 <script>
 /* ---------------------------------------------------------
    CONTENT: questions + results, EN/ES
 --------------------------------------------------------- */
+
+const EMAIL_PHRASES = {
+  en: { greeting: "Hi", resultIntro: "Here's your result:", signoff: "With love," },
+  es: { greeting: "Hola", resultIntro: "Aquí está tu resultado:", signoff: "Con cariño," }
+};
 
 const TYPE_ORDER = ['overgiver', 'overthinker', 'drifter'];
 
@@ -396,6 +415,7 @@ const I18N = {
     "intro.eyebrow": "Take the free quiz",
     "intro.title": "What's really blocking you right now?",
     "intro.copy": "Nine quick questions. One honest answer about the pattern that's been running the show, quietly, in the background of your life. Enter your info below to get started.",
+    "intro.langLabel": "Choose your language",
     "intro.nameLabel": "First name",
     "intro.emailLabel": "Email",
     "intro.error": "Please enter your name and a valid email.",
@@ -403,13 +423,14 @@ const I18N = {
     "quiz.back": "← Back",
     "loading.text": "Finding your result...",
     "result.eyebrow": "Your result",
-    "result.closing": "Thank you for taking a real, honest look at yourself today. That's not nothing. Keep an eye on your inbox, I'll be following up personally.",
+    "result.closing": "Thank you for taking a real, honest look at yourself today. That's not nothing. I just sent this result to your inbox too, so you can come back to it anytime. If it hit home, hit reply, I read every one.",
     "blockLabel": "Your block:"
   },
   es: {
     "intro.eyebrow": "Toma el quiz gratis",
     "intro.title": "¿Qué es lo que de verdad te está bloqueando ahorita?",
     "intro.copy": "Nueve preguntas rápidas. Una respuesta honesta sobre el patrón que ha estado manejando todo, calladito, en el fondo de tu vida. Pon tus datos para empezar.",
+    "intro.langLabel": "Elige tu idioma",
     "intro.nameLabel": "Nombre",
     "intro.emailLabel": "Correo electrónico",
     "intro.error": "Por favor pon tu nombre y un correo válido.",
@@ -417,7 +438,7 @@ const I18N = {
     "quiz.back": "← Atrás",
     "loading.text": "Encontrando tu resultado...",
     "result.eyebrow": "Tu resultado",
-    "result.closing": "Gracias por darte este momento honesto hoy. Eso no es poca cosa. Revisa tu correo, te voy a escribir personalmente.",
+    "result.closing": "Gracias por darte este momento honesto hoy. Eso no es poca cosa. Te acabo de mandar este resultado a tu correo también, para que puedas volver a leerlo cuando quieras. Si te cayó el veinte con algo, contéstame el correo, yo leo todos.",
     "blockLabel": "Tu bloqueo:"
   }
 };
@@ -571,9 +592,19 @@ const RESULTS = {
 --------------------------------------------------------- */
 let lang = 'en';
 let currentQ = 0;
-let userAnswers = new Array(QUESTIONS.length).fill(null); // stores 0/1/2 per question
+let userAnswers = new Array(QUESTIONS.length).fill(null); // stores 0/1/2 per question (original type index, not display position)
+let questionOrder = []; // per-question array mapping display position -> original answer index
 let userName = '';
 let userEmail = '';
+
+function shuffledIndices() {
+  const arr = [0, 1, 2];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
 
 /* ---------------------------------------------------------
    LANGUAGE
@@ -602,6 +633,7 @@ function applyStaticI18n() {
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
+  document.getElementById('topbar').classList.toggle('hidden', id !== 'screen-intro');
 }
 
 /* ---------------------------------------------------------
@@ -625,6 +657,7 @@ function startQuiz() {
 
   currentQ = 0;
   userAnswers = new Array(QUESTIONS.length).fill(null);
+  questionOrder = QUESTIONS.map(() => shuffledIndices());
   showScreen('screen-quiz');
   renderQuestion();
 }
@@ -641,10 +674,11 @@ function renderQuestion() {
 
   const answersDiv = document.getElementById('answers');
   answersDiv.innerHTML = '';
-  q.a.forEach((answerText, idx) => {
+  const order = questionOrder[currentQ] || [0, 1, 2];
+  order.forEach(idx => {
     const btn = document.createElement('button');
     btn.className = 'answer-btn';
-    btn.textContent = answerText;
+    btn.textContent = q.a[idx];
     if (userAnswers[currentQ] === idx) btn.classList.add('selected');
     btn.onclick = () => selectAnswer(idx);
     answersDiv.appendChild(btn);
@@ -701,14 +735,31 @@ function finishQuiz() {
 
   if (typeof fbq === 'function') fbq('track', 'CompleteRegistration');
 
+  const r = RESULTS[resultKey][lang];
+  const fullMessage = (r.tienote ? r.tienote + '\n\n' : '') + r.body.join('\n\n');
+
   // Notify Mariana via EmailJS (fire and forget)
   if (EMAILJS_NOTIFY_TEMPLATE_ID && EMAILJS_NOTIFY_TEMPLATE_ID !== 'REPLACE_WITH_NEW_TEMPLATE_ID') {
     emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_NOTIFY_TEMPLATE_ID, {
       quiz_taker_name: userName,
       quiz_taker_email: userEmail,
-      result_type: RESULTS[resultKey][lang].title,
+      result_type: r.title,
       quiz_language: lang === 'en' ? 'English' : 'Español'
     }).catch(err => console.error('EmailJS notify failed:', err));
+  }
+
+  // Auto-reply to the quiz taker with their own result (fire and forget)
+  if (EMAILJS_AUTOREPLY_TEMPLATE_ID && EMAILJS_AUTOREPLY_TEMPLATE_ID !== 'REPLACE_WITH_AUTOREPLY_TEMPLATE_ID') {
+    const phrases = EMAIL_PHRASES[lang];
+    emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_AUTOREPLY_TEMPLATE_ID, {
+      to_email: userEmail,
+      taker_name: userName,
+      result_title: r.title,
+      result_message: fullMessage,
+      greeting: phrases.greeting,
+      result_intro: phrases.resultIntro,
+      signoff: phrases.signoff
+    }).catch(err => console.error('EmailJS autoreply failed:', err));
   }
 
   setTimeout(() => renderResult(resultKey), 600);
