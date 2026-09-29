@@ -3,376 +3,549 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Subconscious Block Quiz</title>
+<title>What's the invisible pattern running your life?</title>
+<meta name="description" content="Rate 9 statements and find the pattern shaping your choices more than you realize. Takes about 90 seconds.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
+  /* Matches the Enneagram Profile: white page, near-black text,
+     olive and sage for structure, terracotta only for the button. */
   :root {
-    --terra: #C4714A;
-    --terra-bg: #FFF3ED;
-    --gold: #C9A96E;
-    --gold-bg: #FDF7EC;
-    --sage: #7A8C7E;
-    --sage-bg: #EFF3F0;
-    --cream: #F7F3EE;
-    --deep: #1C1814;
+    --page:        #FFFFFF;
+    --page-lift:   #F6F5F2;
+    --charcoal:    #1E2124;
+    --ink-soft:    #3D4045;
+    --muted:       #5C5F63;
+    --olive:       #3F4B2F;
+    --olive-soft:  #4C5A39;
+    --sage-mid:    #8B9682;
+    --sage-bg:     #EDF0E9;
+    --terra:       #BC6A4C;
+    --terra-light: #CE8365;
+    --terra-bg:    #FAF0EA;
+    --rule:        #DCDAD4;
   }
 
-  * { box-sizing: border-box; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
-    margin: 0;
-    font-family: 'DM Sans', sans-serif;
-    background: var(--cream);
-    color: var(--deep);
+    background: var(--page);
+    color: var(--charcoal);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 400;
+    line-height: 1.7;
     min-height: 100vh;
   }
 
-  .wrap {
-    max-width: 640px;
-    margin: 0 auto;
-    padding: 32px 24px 64px;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .topbar {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    margin-bottom: 24px;
-  }
-
-  .topbar.hidden { display: none; }
-
-  .lang-label {
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    color: var(--sage);
-    margin-bottom: 6px;
-  }
-
-  .lang-toggle {
-    display: flex;
-    border: 1px solid var(--gold);
-    border-radius: 999px;
-    overflow: hidden;
-  }
-
-  .lang-toggle button {
-    border: none;
-    background: transparent;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-    letter-spacing: 0.02em;
-    padding: 8px 18px;
-    cursor: pointer;
-    color: var(--deep);
-    opacity: 0.55;
-  }
-
-  .lang-toggle button.active {
-    background: var(--gold);
-    color: #fff;
-    opacity: 1;
-  }
-
-  .screen { display: none; flex: 1; flex-direction: column; }
+  .screen { display: none; min-height: 100vh; flex-direction: column; }
   .screen.active { display: flex; }
 
-  /* Intro screen */
-  .eyebrow {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--terra);
-    margin-bottom: 14px;
-  }
-
-  h1 {
-    font-family: 'Cormorant Garamond', serif;
-    font-weight: 600;
-    font-size: 42px;
-    line-height: 1.15;
-    margin: 0 0 18px;
-  }
-
-  .intro-copy {
-    font-size: 17px;
-    line-height: 1.6;
-    color: #4a453f;
-    margin-bottom: 28px;
-  }
-
-  .field-label {
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 0.03em;
-    text-transform: uppercase;
-    color: var(--terra);
-    display: block;
-    margin-bottom: 6px;
-  }
-
-  input[type="text"], input[type="email"] {
+  .inner {
+    max-width: 640px;
     width: 100%;
-    padding: 14px 16px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 16px;
-    border: 1px solid #ddd3c8;
-    border-radius: 10px;
-    background: #fff;
-    margin-bottom: 18px;
-  }
-
-  input[type="text"]:focus, input[type="email"]:focus {
-    outline: 2px solid var(--terra);
-    outline-offset: 1px;
-  }
-
-  .btn-primary {
-    background: var(--terra);
-    color: #fff;
-    border: none;
-    border-radius: 999px;
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 700;
-    font-size: 16px;
-    padding: 16px 28px;
-    cursor: pointer;
-    width: 100%;
-    transition: transform 0.1s ease;
-  }
-
-  .btn-primary:hover { transform: translateY(-1px); }
-  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-
-  .error-msg {
-    color: var(--terra);
-    font-size: 14px;
-    margin: -10px 0 14px;
-    display: none;
-  }
-
-  /* Quiz screen */
-  .progress-track {
-    height: 6px;
-    background: var(--sage-bg);
-    border-radius: 999px;
-    margin-bottom: 32px;
-    overflow: hidden;
-  }
-
-  .progress-fill {
-    height: 100%;
-    background: var(--gold);
-    border-radius: 999px;
-    transition: width 0.35s ease;
-    width: 0%;
-  }
-
-  .q-count {
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--sage);
-    margin-bottom: 10px;
-  }
-
-  .q-text {
-    font-family: 'Cormorant Garamond', serif;
-    font-weight: 600;
-    font-size: 30px;
-    line-height: 1.25;
-    margin: 0 0 28px;
-  }
-
-  .answers { display: flex; flex-direction: column; gap: 12px; }
-
-  .answer-btn {
-    text-align: left;
-    background: #fff;
-    border: 1.5px solid #e6ddd0;
-    border-radius: 14px;
-    padding: 18px 20px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 16px;
-    line-height: 1.45;
-    color: var(--deep);
-    cursor: pointer;
-    transition: border-color 0.15s ease, background 0.15s ease;
-  }
-
-  .answer-btn:hover { border-color: var(--gold); background: var(--gold-bg); }
-  .answer-btn.selected { border-color: var(--terra); background: var(--terra-bg); }
-
-  .nav-row {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 28px;
-  }
-
-  .btn-back {
-    background: transparent;
-    border: none;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--sage);
-    cursor: pointer;
-    padding: 10px 4px;
-  }
-
-  .btn-back:disabled { visibility: hidden; }
-
-  /* Loading */
-  .loading-wrap {
+    margin: 0 auto;
+    padding: 56px 24px 72px;
     flex: 1;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
   }
 
-  .spinner {
-    width: 40px;
-    height: 40px;
-    border: 3px solid var(--gold-bg);
-    border-top-color: var(--terra);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
+  button:focus-visible, a:focus-visible, input:focus-visible {
+    outline: 2px solid var(--terra);
+    outline-offset: 2px;
+  }
+
+  /* ---------- Shared ---------- */
+  .badge {
+    align-self: flex-start;
+    display: inline-block;
+    border: 1px solid var(--sage-mid);
+    color: var(--olive);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 5px 16px;
+    border-radius: 100px;
+    margin-bottom: 26px;
+  }
+
+  h1, .statement, .tie-title, .result-title, .result-headline, .bridge h3, .practice h3 {
+    font-family: 'Cormorant Garamond', serif;
+    color: var(--charcoal);
+    letter-spacing: -0.005em;
+  }
+
+  .btn-primary {
+    display: inline-block;
+    text-align: center;
+    text-decoration: none;
+    background: var(--terra);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 500;
+    font-size: 15px;
+    letter-spacing: 0.01em;
+    padding: 16px 32px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-primary:hover { background: var(--terra-light); }
+
+  /* ---------- Intro ---------- */
+  h1 {
+    font-weight: 400;
+    font-size: clamp(38px, 7vw, 56px);
+    line-height: 1.05;
     margin-bottom: 20px;
+  }
+
+  .intro-copy {
+    font-size: 16px;
+    color: var(--ink-soft);
+    margin-bottom: 10px;
+    max-width: 46ch;
+  }
+
+  .intro-honest {
+    font-size: 14.5px;
+    color: var(--muted);
+    margin-bottom: 30px;
+    max-width: 48ch;
+  }
+
+  .meta-row {
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    padding: 18px 0;
+    margin-bottom: 30px;
+  }
+
+  .meta-label { display: block; font-size: 12.5px; font-weight: 500; color: var(--muted); }
+  .meta-value { font-size: 16px; color: var(--charcoal); }
+
+  .intake-form {
+    background: var(--page-lift);
+    border: 1px solid var(--rule);
+    padding: 28px;
+    margin-bottom: 24px;
+  }
+
+  .intake-why { font-size: 15.5px; font-weight: 500; margin-bottom: 18px; }
+
+  .intake-form label {
+    display: block;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--charcoal);
+    margin-bottom: 8px;
+  }
+
+  .intake-form input {
+    width: 100%;
+    background: #fff;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 12px 16px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 16px;
+    color: var(--charcoal);
+    margin-bottom: 20px;
+    outline: none;
+  }
+
+  .intake-form input:focus { border-color: var(--olive); }
+  .intake-form input::placeholder { color: var(--muted); }
+
+  .error-msg {
+    background: var(--terra-bg);
+    border: 1px solid var(--terra-light);
+    border-radius: 3px;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--terra);
+    display: none;
+  }
+
+  /* ---------- Quiz ---------- */
+  .quiz-header {
+    background: var(--charcoal);
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  .quiz-logo { font-size: 13px; font-weight: 500; color: var(--page-lift); white-space: nowrap; }
+  .quiz-progress-wrap { flex: 1; max-width: 280px; }
+
+  .quiz-progress-label {
+    font-size: 12.5px;
+    font-weight: 500;
+    color: rgba(246,244,240,0.7);
+    text-align: right;
+    margin-bottom: 6px;
+  }
+
+  .quiz-progress-bar { height: 3px; background: rgba(255,255,255,0.16); border-radius: 100px; overflow: hidden; }
+  .progress-fill { height: 100%; width: 0%; background: var(--sage-mid); border-radius: 100px; transition: width 0.4s ease; }
+
+  .section-intro h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400;
+    font-size: clamp(26px, 4vw, 34px);
+    line-height: 1.2;
+    margin-bottom: 8px;
+  }
+
+  .section-intro p { font-size: 14.5px; color: var(--ink-soft); margin-bottom: 30px; }
+
+  .question-card {
+    background: var(--page-lift);
+    border: 1px solid var(--rule);
+    padding: 34px 32px;
+  }
+
+  .q-count { display: block; font-size: 12.5px; font-weight: 500; color: var(--muted); margin-bottom: 12px; }
+
+  .statement {
+    font-weight: 400;
+    font-size: clamp(23px, 3.4vw, 29px);
+    line-height: 1.35;
+    margin-bottom: 28px;
+    min-height: 2.7em;
+  }
+
+  .scale { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+
+  .scale-btn {
+    min-height: 52px;
+    background: #fff;
+    border: 1.5px solid var(--rule);
+    border-radius: 10px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .scale-btn:hover { border-color: var(--sage-mid); color: var(--charcoal); }
+  .scale-btn.selected { background: var(--sage-bg); border-color: var(--olive); color: var(--olive); font-weight: 600; }
+
+  .scale-labels {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    margin-top: 8px;
+    font-size: 12px;
+    line-height: 1.35;
+    color: var(--muted);
+  }
+
+  .scale-labels span:nth-child(1) { grid-column: 1; text-align: left; }
+  .scale-labels span:nth-child(2) { grid-column: 3; text-align: center; }
+  .scale-labels span:nth-child(3) { grid-column: 5; text-align: right; }
+
+  .quiz-nav { margin-top: 24px; }
+
+  .btn-back {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 8px 0;
+  }
+
+  .btn-back:hover { color: var(--charcoal); }
+  .btn-back:disabled { visibility: hidden; }
+
+  /* ---------- Tie-breaker ---------- */
+  .tie-title { font-weight: 400; font-size: clamp(28px, 4.5vw, 36px); line-height: 1.15; margin-bottom: 10px; }
+  .tie-sub { font-size: 15px; color: var(--ink-soft); margin-bottom: 26px; }
+  .tie-options { display: flex; flex-direction: column; gap: 10px; }
+
+  .tie-btn {
+    text-align: left;
+    background: var(--page-lift);
+    border: 1.5px solid var(--rule);
+    padding: 18px 20px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 21px;
+    line-height: 1.35;
+    color: var(--charcoal);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .tie-btn:hover { border-color: var(--olive); background: var(--sage-bg); }
+
+  /* ---------- Loading ---------- */
+  .loading-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+
+  .spinner {
+    width: 56px;
+    height: 56px;
+    border: 2px solid var(--rule);
+    border-top-color: var(--olive);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 28px;
   }
 
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* Result screen */
-  .result-eyebrow {
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--sage);
+  .loading-title { font-family: 'Cormorant Garamond', serif; font-size: 32px; color: var(--charcoal); }
+
+  /* ---------- Result ---------- */
+  .result-header {
+    background: var(--page-lift);
+    border-bottom: 1px solid var(--rule);
+    padding: 56px 24px 44px;
+    text-align: center;
+  }
+
+  .result-name { font-size: 15px; color: var(--ink-soft); margin-bottom: 26px; }
+
+  .result-label {
+    position: relative;
+    padding-top: 24px;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--muted);
     margin-bottom: 10px;
   }
 
-  .result-tienote {
-    font-size: 15px;
-    font-style: italic;
-    color: var(--sage);
-    margin-bottom: 18px;
-    line-height: 1.5;
+  .result-label::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 36px; height: 1px;
+    background: var(--olive);
   }
 
   .result-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-weight: 600;
-    font-size: 38px;
-    line-height: 1.15;
-    color: var(--terra);
-    margin: 0 0 24px;
+    font-weight: 300;
+    font-size: clamp(46px, 9vw, 70px);
+    line-height: 1.03;
+    letter-spacing: -0.02em;
   }
 
-  .result-body p {
-    font-size: 17px;
-    line-height: 1.7;
-    color: #3a352f;
-    margin: 0 0 18px;
+  .result-content { max-width: 680px; width: 100%; margin: 0 auto; padding: 48px 24px 80px; }
+
+  .result-headline {
+    font-weight: 500;
+    font-size: clamp(25px, 3.4vw, 32px);
+    line-height: 1.25;
+    margin-bottom: 24px;
   }
 
-  .result-body p.block-label {
-    font-weight: 700;
-    color: var(--deep);
-  }
+  .result-body p { font-size: 16px; line-height: 1.75; margin-bottom: 16px; max-width: 68ch; }
+  .result-body p.goal { font-weight: 600; margin-top: 24px; }
 
-  .result-closing {
-    margin-top: 24px;
-    padding: 22px;
+  .practice {
     background: var(--sage-bg);
-    border-radius: 14px;
-    font-size: 15px;
-    line-height: 1.6;
-    color: #3a352f;
+    border-left: 3px solid var(--olive);
+    padding: 28px 30px;
+    margin: 36px 0;
   }
 
-  @media (max-width: 480px) {
-    h1 { font-size: 32px; }
-    .q-text { font-size: 25px; }
-    .result-title { font-size: 30px; }
+  .practice h3 { font-weight: 500; font-size: 27px; margin-bottom: 14px; }
+  .practice p { font-size: 15.5px; line-height: 1.75; margin-bottom: 14px; }
+  .practice p:last-child { margin-bottom: 0; font-weight: 500; }
+
+  .panel { border: 1px solid var(--rule); margin-bottom: 36px; }
+
+  .panel-head {
+    background: var(--olive);
+    color: #fff;
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    padding: 11px 20px;
+  }
+
+  .panel-body { padding: 22px 20px; }
+
+  .ru-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400;
+    font-size: 32px;
+    line-height: 1.1;
+    color: var(--olive);
+    margin-bottom: 10px;
+  }
+
+  .ru-headline { font-size: 15px; line-height: 1.65; color: var(--charcoal); }
+
+  .panel-note {
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid var(--rule);
+  }
+
+  .bridge {
+    background: var(--page-lift);
+    border-left: 3px solid var(--olive);
+    padding: 30px 30px 32px;
+  }
+
+  .bridge h3 { font-weight: 500; font-size: clamp(25px, 3.2vw, 31px); line-height: 1.2; margin-bottom: 14px; }
+  .bridge p { font-size: 16px; line-height: 1.75; margin-bottom: 24px; }
+
+  .email-notice {
+    background: var(--sage-bg);
+    border-left: 3px solid var(--sage-mid);
+    padding: 14px 18px;
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    margin-top: 32px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+  }
+
+  @media (max-width: 600px) {
+    .inner { padding: 40px 20px 60px; }
+    .question-card { padding: 24px 18px; }
+    .scale { gap: 6px; }
+    .scale-labels { gap: 6px; font-size: 11.5px; }
+    .practice, .bridge { padding: 24px 20px; }
+    .btn-primary { display: block; width: 100%; }
+    .meta-row { gap: 20px; }
   }
 </style>
 </head>
 <body>
 
-<div class="wrap">
-
-  <div class="topbar" id="topbar">
-    <div class="lang-label" data-i18n="intro.langLabel">Choose your language</div>
-    <div class="lang-toggle">
-      <button id="lang-en" class="active" onclick="setLang('en')">English</button>
-      <button id="lang-es" onclick="setLang('es')">Español</button>
-    </div>
-  </div>
-
-  <!-- INTRO SCREEN -->
+  <!-- INTRO -->
   <div class="screen active" id="screen-intro">
-    <div class="eyebrow" data-i18n="intro.eyebrow">Take the free quiz</div>
-    <h1 data-i18n="intro.title">What's really blocking you right now?</h1>
-    <p class="intro-copy" data-i18n="intro.copy">
-      Nine quick questions. One honest answer about the pattern that's been running the show,
-      quietly, in the background of your life. Enter your info below to get started.
-    </p>
+    <div class="inner">
+      <span class="badge">Free pattern quiz</span>
+      <h1>What's the invisible pattern running your life?</h1>
+      <p class="intro-copy">Rate these 9 statements and find the pattern that's shaping your choices more than you realize.</p>
+      <p class="intro-honest">This isn't a personality test. It's a quick look at which pattern feels loudest in your life right now.</p>
 
-    <label class="field-label" data-i18n="intro.nameLabel">First name</label>
-    <input type="text" id="input-name" autocomplete="given-name">
+      <div class="meta-row">
+        <div><span class="meta-label">Statements</span><span class="meta-value">9</span></div>
+        <div><span class="meta-label">Time</span><span class="meta-value">~90 seconds</span></div>
+        <div><span class="meta-label">Result</span><span class="meta-value">Your loudest pattern</span></div>
+      </div>
 
-    <label class="field-label" data-i18n="intro.emailLabel">Email</label>
-    <input type="email" id="input-email" autocomplete="email">
-    <div class="error-msg" id="intro-error" data-i18n="intro.error">Please enter your name and a valid email.</div>
+      <div class="intake-form">
+        <p class="intake-why">First, where should I send your result?</p>
+        <label for="input-name">Your first name</label>
+        <input type="text" id="input-name" placeholder="e.g. Sofia" autocomplete="given-name">
+        <label for="input-email">Your email address</label>
+        <input type="email" id="input-email" placeholder="sofia@example.com" autocomplete="email">
+        <div class="error-msg" id="intro-error" role="alert" aria-live="polite">Please enter your first name and a valid email.</div>
+      </div>
 
-    <button class="btn-primary" onclick="startQuiz()" data-i18n="intro.cta">Start the quiz</button>
-  </div>
-
-  <!-- QUIZ SCREEN -->
-  <div class="screen" id="screen-quiz">
-    <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
-    <div class="q-count" id="q-count">Question 1 of 9</div>
-    <div class="q-text" id="q-text"></div>
-    <div class="answers" id="answers"></div>
-    <div class="nav-row">
-      <button class="btn-back" id="btn-back" onclick="goBack()" data-i18n="quiz.back">← Back</button>
+      <button class="btn-primary" onclick="startQuiz()">Find my pattern</button>
     </div>
   </div>
 
-  <!-- LOADING SCREEN -->
+  <!-- QUIZ -->
+  <div class="screen" id="screen-quiz">
+    <div class="quiz-header">
+      <div class="quiz-logo">Pattern Quiz</div>
+      <div class="quiz-progress-wrap">
+        <div class="quiz-progress-label" id="q-progress">1 of 9</div>
+        <div class="quiz-progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+      </div>
+    </div>
+    <div class="inner">
+      <div class="section-intro">
+        <h2>How much does this sound like you?</h2>
+        <p>Go with your first instinct, the version of you that shows up most of the time.</p>
+      </div>
+      <div class="question-card">
+        <span class="q-count" id="q-count">Statement 1 of 9</span>
+        <div class="statement" id="statement"></div>
+        <div class="scale" id="scale"></div>
+        <div class="scale-labels">
+          <span>Not me at all</span>
+          <span>Sometimes</span>
+          <span>Ouch, this is me</span>
+        </div>
+      </div>
+      <div class="quiz-nav">
+        <button class="btn-back" id="btn-back" onclick="goBack()">&larr; Back</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIE-BREAKER -->
+  <div class="screen" id="screen-tie">
+    <div class="inner">
+      <h2 class="tie-title" id="tie-title">Which of these sounds more like you?</h2>
+      <p class="tie-sub" id="tie-sub">A few of these came out even. Go with your gut.</p>
+      <div class="tie-options" id="tie-options"></div>
+    </div>
+  </div>
+
+  <!-- LOADING -->
   <div class="screen" id="screen-loading">
     <div class="loading-wrap">
       <div class="spinner"></div>
-      <div data-i18n="loading.text">Finding your result...</div>
+      <div class="loading-title">Finding your pattern...</div>
     </div>
   </div>
 
-  <!-- RESULT SCREEN -->
+  <!-- RESULT -->
   <div class="screen" id="screen-result">
-    <div class="result-eyebrow" data-i18n="result.eyebrow">Your result</div>
-    <div class="result-tienote" id="result-tienote" style="display:none;"></div>
-    <h2 class="result-title" id="result-title"></h2>
-    <div class="result-body" id="result-body"></div>
-    <div class="result-closing" data-i18n="result.closing">
-      Thank you for taking a real, honest look at yourself today. That's not nothing.
-      Keep an eye on your inbox, I'll be following up personally.
+    <div class="result-header">
+      <div class="result-name" id="result-name"></div>
+      <div class="result-label">Your loudest pattern</div>
+      <h2 class="result-title" id="result-title"></h2>
+    </div>
+
+    <div class="result-content">
+      <p class="result-headline" id="result-headline"></p>
+      <div class="result-body" id="result-body"></div>
+
+      <div class="practice">
+        <h3>Try this for 2 minutes</h3>
+        <p id="practice-steps"></p>
+        <p id="practice-notice"></p>
+        <p id="practice-close"></p>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">Close behind</div>
+        <div class="panel-body">
+          <div class="ru-name" id="ru-name"></div>
+          <p class="ru-headline" id="ru-headline"></p>
+          <p class="panel-note">These two patterns work together in ways that are easy to miss.</p>
+        </div>
+      </div>
+
+      <div class="bridge">
+        <h3>This is a pattern, not your personality.</h3>
+        <p>Your pattern shows you what you do. Your Enneagram type, the deeper personality pattern underneath, shows you why. Your Enneagram Profile goes deeper into your likely type, your core motivations, your blind spots, and how your top two patterns shape the way you work, love, and make decisions.</p>
+        <a class="btn-primary" id="profile-cta" href="https://marianavaldez.com/#profile" target="_blank" rel="noopener" onclick="trackProfileClick()">Discover my Enneagram Profile - $27</a>
+      </div>
+
+      <div class="email-notice">
+        Thank you for taking a real, honest look at yourself today. That's not nothing. I also sent your result to your inbox, so you can come back to it anytime. If it hit home, hit reply, I read every one.
+      </div>
     </div>
   </div>
-
-</div>
 
 <!-- Meta Pixel -->
 <script>
@@ -385,317 +558,256 @@ fbq('init', '1309711794380173');
 fbq('track', 'PageView');
 </script>
 
-<!-- EmailJS -->
+<!-- EmailJS (same account and templates as the previous quiz) -->
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
-  emailjs.init({ publicKey: "Hbh_HwtgRTKQhMroG" });
-
   const EMAILJS_SERVICE_ID = "service_tpldbbn";
-  // Notifies Mariana when someone completes the quiz.
-  const EMAILJS_NOTIFY_TEMPLATE_ID = "template_i4uv22r";
-  // TODO Mariana: create a second EmailJS template — this one sends the quiz
-  // taker their own result. See README-setup.md for the exact fields to use.
-  const EMAILJS_AUTOREPLY_TEMPLATE_ID = "template_03nwoq5";
+  const EMAILJS_NOTIFY_TEMPLATE_ID = "template_i4uv22r";    // notifies Mariana
+  const EMAILJS_AUTOREPLY_TEMPLATE_ID = "template_03nwoq5"; // sends the quiz taker her result
+  // If an ad blocker stops EmailJS from loading, the quiz still works; only the emails are skipped.
+  try { emailjs.init({ publicKey: "Hbh_HwtgRTKQhMroG" }); } catch (e) { console.warn("EmailJS not loaded"); }
 </script>
 
 <script>
 /* ---------------------------------------------------------
-   CONTENT: questions + results, EN/ES
+   CONTENT
 --------------------------------------------------------- */
+const PROFILE_URL = "https://marianavaldez.com/#profile";
 
-const EMAIL_PHRASES = {
-  en: { greeting: "Hi", resultIntro: "Here's your result:", signoff: "With love," },
-  es: { greeting: "Hola", resultIntro: "Aquí está tu resultado:", signoff: "Con cariño," }
-};
+const PATTERN_KEYS = ["critic", "overgiver", "prover", "outsider", "retreater", "worrier", "escaper", "protector", "peacekeeper"];
 
-const TYPE_ORDER = ['overgiver', 'overthinker', 'drifter'];
-
-const I18N = {
-  en: {
-    "intro.eyebrow": "Take the free quiz",
-    "intro.title": "What's really blocking you right now?",
-    "intro.copy": "Nine quick questions. One honest answer about the pattern that's been running the show, quietly, in the background of your life. Enter your info below to get started.",
-    "intro.langLabel": "Choose your language",
-    "intro.nameLabel": "First name",
-    "intro.emailLabel": "Email",
-    "intro.error": "Please enter your name and a valid email.",
-    "intro.cta": "Start the quiz",
-    "quiz.back": "← Back",
-    "loading.text": "Finding your result...",
-    "result.eyebrow": "Your result",
-    "result.closing": "Thank you for taking a real, honest look at yourself today. That's not nothing. I just sent this result to your inbox too, so you can come back to it anytime. If it hit home, hit reply, I read every one.",
-    "blockLabel": "Your block:"
+const PATTERNS = {
+  critic: {
+    name: `The Critic`,
+    statement: `"When something isn't done the right way, it bothers me until I fix it."`,
+    headline: `You're not picky. You just can't turn off the part of you that sees what's wrong.`,
+    body: [
+      `You notice the typo. The crooked frame. The thing someone said they'd do and didn't. You've redone the dishes after someone else "did" them.`,
+      `And when you finish something, your mind goes straight to what could have been better.`,
+      `People call you responsible and reliable, and you are. But it's tiring to always be the one who notices. Even more tiring when that voice turns on you.`
+    ],
+    goal: `The goal isn't to lower your standards. It's learning to tell the difference between "this could be better" and "this isn't good enough."`,
+    practice: {
+      steps: `Think of one thing you're criticizing yourself for today. Say it out loud the way your mind says it: "I should have..." Now say it again as: "Next time, I could..." Then finish with: "This doesn't have to be perfect to be enough."`,
+      notice: `Then notice. Which version felt true? Did the "could" version feel like letting yourself off the hook? Did your mind jump to a new thing to fix?`,
+      close: `Don't fix it. Just notice.`
+    }
   },
-  es: {
-    "intro.eyebrow": "Toma el quiz gratis",
-    "intro.title": "¿Qué es lo que de verdad te está bloqueando ahorita?",
-    "intro.copy": "Nueve preguntas rápidas. Una respuesta honesta sobre el patrón que ha estado manejando todo, calladito, en el fondo de tu vida. Pon tus datos para empezar.",
-    "intro.langLabel": "Elige tu idioma",
-    "intro.nameLabel": "Nombre",
-    "intro.emailLabel": "Correo electrónico",
-    "intro.error": "Por favor pon tu nombre y un correo válido.",
-    "intro.cta": "Empezar el quiz",
-    "quiz.back": "← Atrás",
-    "loading.text": "Encontrando tu resultado...",
-    "result.eyebrow": "Tu resultado",
-    "result.closing": "Gracias por darte este momento honesto hoy. Eso no es poca cosa. Te acabo de mandar este resultado a tu correo también, para que puedas volver a leerlo cuando quieras. Si te cayó el veinte con algo, contéstame el correo, yo leo todos.",
-    "blockLabel": "Tu bloqueo:"
-  }
-};
-
-const QUESTIONS = [
-  {
-    en: { q: "You realize you're stuck in an area of your life. What's your gut reaction?",
-      a: ["Try harder. Fix it myself. Work more.", "Research it to death before I do anything.", "Tell myself it's not that bad and distract myself."] },
-    es: { q: "Te das cuenta que estás estancada en algo. ¿Cuál es tu primera reacción?",
-      a: ["Le echo más ganas. Lo arreglo yo sola. Trabajo más.", "Me pongo a investigar todo antes de mover un dedo.", "Me digo que no está tan mal y me distraigo con otra cosa."] }
-  },
-  {
-    en: { q: "You have an idea that actually excites you. What stops you from starting?",
-      a: ["I keep perfecting it instead of launching it.", "I feel like I need one more course, one more sign, before anyone takes me seriously.", "The excitement fades, and I quietly go back to something easier."] },
-    es: { q: "Tienes una idea que de verdad te emociona. ¿Qué te detiene?",
-      a: ["Sigo perfeccionándola en vez de lanzarla.", "Siento que necesito un curso más, una señal más, antes de que alguien me tome en serio.", "Se me pasa la emoción y regreso a algo más fácil."] }
-  },
-  {
-    en: { q: "Be brutally honest about your relationship with rest.",
-      a: ["Rest feels earned, not given. If I sit still too long, guilt creeps in.", "My body rests but my mind doesn't. I'm still replaying, still planning.", "I use rest as a hiding place, scrolling instead of facing what actually needs my attention."] },
-    es: { q: "Sé bien honesta contigo misma sobre tu relación con el descanso.",
-      a: ["Sentir que me lo gané, no que me lo merezco. Si paro mucho tiempo, me da culpa.", "Mi cuerpo descansa pero mi mente no. Sigo dando vueltas a todo.", "Uso el descanso para esconderme. Prefiero el scroll que enfrentar lo que de verdad importa."] }
-  },
-  {
-    en: { q: "Someone crosses a boundary with you. What do you actually do?",
-      a: ["Go into fixer mode and handle it myself.", "Replay it in my head a hundred times, but rarely say anything.", "Smooth it over. Keep the peace. Swallow it."] },
-    es: { q: "Alguien cruza un límite contigo. ¿Qué haces en realidad?",
-      a: ["Me pongo en modo solucionadora y lo arreglo yo.", "Le doy vueltas y vueltas en mi cabeza, pero casi nunca lo digo.", "Lo dejo pasar. Prefiero la paz. Me lo trago."] }
-  },
-  {
-    en: { q: "Which thought sounds most like your inner voice on a hard day?",
-      a: ["\"If I don't do it, nobody will.\"", "\"I'm just not ready yet.\"", "\"It is what it is.\""] },
-    es: { q: "¿Cuál pensamiento suena más a tu voz interna en un día difícil?",
-      a: ["\"Si no lo hago yo, no lo hace nadie.\"", "\"Todavía no estoy lista.\"", "\"Ni modo, así es esto.\""] }
-  },
-  {
-    en: { q: "What's the fear under your biggest goal, the one you don't say out loud?",
-      a: ["Failing. Being exposed as not enough.", "Being seen, judged, rejected.", "The disruption real change would actually cause."] },
-    es: { q: "¿Cuál es el miedo detrás de tu meta más grande, el que no dices en voz alta?",
-      a: ["Fallar. Que se note que no soy suficiente.", "Que me vean, me juzguen, me rechacen.", "El desmadre que causaría un cambio de verdad."] }
-  },
-  {
-    en: { q: "How do you make big decisions?",
-      a: ["Fast. Efficient. Whatever keeps me in control.", "Slowly. I need every opinion, every worst-case scenario first.", "I let life decide for me. I go with the flow."] },
-    es: { q: "¿Cómo tomas las decisiones importantes?",
-      a: ["Rápido. Eficiente. Lo que me deje con el control.", "Lentísimo. Necesito escuchar a todo mundo antes de decidir.", "Dejo que la vida decida por mí. Me voy con la corriente."] }
-  },
-  {
-    en: { q: "What's quietly draining you the most right now?",
-      a: ["Saying yes to everyone but myself.", "Staying in \"research mode\" so I never have to actually try.", "Numbing out instead of doing the thing I know I need to do."] },
-    es: { q: "¿Qué te está drenando ahorita, aunque no lo digas?",
-      a: ["Decirle que sí a todos menos a mí misma.", "Quedarme en modo \"investigación\" para nunca tener que intentarlo.", "Entumecerme en vez de hacer lo que ya sé que tengo que hacer."] }
-  },
-  {
-    en: { q: "If your block disappeared today, what would you actually want?",
-      a: ["To be valued for who I am, not just what I do for everyone else.", "Real clarity and confidence, without needing anyone's permission.", "To stop drifting and actually feel alive again."] },
-    es: { q: "Si tu bloqueo desapareciera hoy, ¿qué es lo que de verdad quieres?",
-      a: ["Que me valoren por quien soy, no solo por lo que hago por todos.", "Claridad y confianza real, sin necesitar el permiso de nadie.", "Dejar de andar en automático y sentirme viva otra vez."] }
-  }
-];
-
-const RESULTS = {
   overgiver: {
-    en: { title: "The Over-Giver", body: [
-      "Your block: You tie your worth to what you do for everyone else.",
-      "You're the one who handles it. Fixes it. Shows up for everyone, every time, whether or not anyone asked you to carry that much. Somewhere along the way you learned that being needed felt safer than being wanted, so you kept proving it, over and over.",
-      "You don't have to stop being generous to stop disappearing. Healing this isn't about doing less for people, it's about finally doing something for yourself, on purpose, without earning it first."
-    ]},
-    es: { title: "La que todo lo carga", body: [
-      "Tu bloqueo: sientes que vales por lo que haces por los demás.",
-      "Eres la que resuelve todo. La que arregla. La que aparece por todos, siempre, aunque nadie te lo haya pedido. En algún momento aprendiste que ser necesitada se sentía más seguro que ser querida, y por eso lo sigues probando, una y otra vez.",
-      "No tienes que dejar de dar para dejar de desaparecer. Puedes hacer las dos cosas a la vez, seguir siendo generosa Y empezar a hacer algo por ti, a propósito, sin tener que ganártelo primero."
-    ]}
+    name: `The Over-Giver`,
+    statement: `"I take care of everyone's needs, but mine always come last."`,
+    headline: `You're the one everyone counts on. The question is, who do you get to count on?`,
+    body: [
+      `You notice someone's upset before they say a word. You remember the birthdays, the allergies, the hard week your friend mentioned once. You say yes before checking if you have the energy.`,
+      `And when someone asks what you need, you say "I'm fine." You mostly mean it.`,
+      `Until one day you feel resentful and can't explain why.`
+    ],
+    goal: `The goal isn't to stop caring. It's learning to tell the difference between giving because you want to and giving because you feel you have to.`,
+    practice: {
+      steps: `Cross your arms and rest your hands on your own shoulders, the way you'd hold a friend who's had a long day. Stay there for 5 slow breaths, and on every exhale ask yourself: "What do I need right now?" Take the first answer that comes, even if it's small.`,
+      notice: `Then notice. Did an answer come right away, or was it blank? Did holding yourself feel comforting, or awkward? Did asking feel a little selfish?`,
+      close: `Don't judge it. Just notice.`
+    }
   },
-  overthinker: {
-    en: { title: "The Overthinker", body: [
-      "Your block: You stay in research mode so you never have to risk being wrong.",
-      "You've read the books. Taken the courses. Asked everyone for their opinion. And somewhere in all that gathering, the actual moving forward keeps getting pushed to \"after I know more.\" The truth is you already know enough. What you're actually waiting for is permission that nobody's coming to give you.",
-      "Clarity doesn't come before action, it comes from it. You don't need one more sign. You need one small, imperfect move."
-    ]},
-    es: { title: "La que lo piensa demasiado", body: [
-      "Tu bloqueo: te quedas en modo investigación para nunca arriesgarte a equivocarte.",
-      "Ya leíste los libros. Tomaste los cursos. Le preguntaste a todo mundo su opinión. Y entre tanto investigar, el dar el paso se sigue quedando para \"cuando sepa más.\" La verdad es que ya sabes suficiente. Lo que en realidad esperas es un permiso que nadie te va a dar.",
-      "La claridad no llega antes de la acción, llega después. No necesitas una señal más. Necesitas un paso, aunque sea chiquito, aunque sea imperfecto."
-    ]}
+  prover: {
+    name: `The Prover`,
+    statement: `"When I reach a goal, the good feeling fades fast and I'm already chasing the next one."`,
+    headline: `You don't just like achieving. You might have learned to measure yourself by it.`,
+    body: [
+      `You're really good at getting things done. You set the goal, you figure it out, you make it happen. From the outside, you look confident, capable, driven.`,
+      `A productive day feels good. Recognition feels really good. But a slow day? That comes with guilt, like you're falling behind.`,
+      `And when you finally get the thing you worked so hard for, the satisfaction lasts about five minutes before your brain asks: okay, what's next?`
+    ],
+    goal: `The goal isn't to be less ambitious. It's learning to tell the difference between "I did something valuable" and "I'm valuable because I did something."`,
+    practice: {
+      steps: `Put one hand on your chest. Breathe in for 4 counts, then out slowly for 6 to 8. Do this 5 times, and on every exhale tell yourself: "I don't have to prove anything right now."`,
+      notice: `Then notice. Does your body soften? Does your mind argue with you? Did you suddenly remember everything you should be doing instead?`,
+      close: `Don't try to fix it. Just notice. Sometimes the most revealing part is the part of you that doesn't believe it.`
+    }
   },
-  drifter: {
-    en: { title: "The Drifter", body: [
-      "Your block: You'd rather feel comfortable than feel alive.",
-      "Not because you're lazy, because facing what actually needs to change feels like too much. So you scroll, you distract, you tell yourself it's fine. And some days it genuinely is. But somewhere underneath, you know you're on autopilot, and it's costing you the life you actually want.",
-      "You don't need a massive overhaul. You need to stop numbing for just long enough to feel what you actually want, and take one real step toward it."
-    ]},
-    es: { title: "La que se distrae", body: [
-      "Tu bloqueo: prefieres sentirte cómoda que sentirte viva.",
-      "No porque seas floja, sino porque enfrentar lo que de verdad necesita cambiar se siente como demasiado. Así que te distraes, haces scroll, te dices que está bien. Y algunos días de verdad lo está. Pero por dentro sabes que andas en automático, y te está costando la vida que en realidad quieres.",
-      "No necesitas un cambio radical. Necesitas dejar de entumecerte el tiempo suficiente para sentir lo que de verdad quieres, y dar un paso real hacia eso."
-    ]}
+  outsider: {
+    name: `The Outsider`,
+    statement: `"When I see other people who seem happy and settled, I feel a longing I can't quite explain."`,
+    headline: `You can have a good life and still feel like something's missing.`,
+    body: [
+      `Nothing's wrong, exactly. Your life looks good on paper. But you scroll past someone else's and feel a pull you can't name.`,
+      `You can be in a room full of people who love you and still feel a little outside of it. Ordinary days can feel flat, like real life is happening somewhere else.`,
+      `When your attention keeps going to what's missing, it's hard to feel what's already here.`
+    ],
+    goal: `The goal isn't to feel less. It's learning to tell the difference between "something is missing" and "something is missing in me."`,
+    practice: {
+      steps: `Notice the question your mind keeps asking: "What's missing?" Now swap it. Finish this sentence out loud three times, and be specific each time: "Something I have right now that I actually love is..."`,
+      notice: `Then notice. Was it hard to come up with three? Did your mind add a "yeah, but..."? Did one of them surprise you?`,
+      close: `Don't force the feeling. Just notice.`
+    }
   },
-  overgiver_overthinker: {
-    en: { title: "The Over-Achieving Overthinker",
-      tienote: "You scored equally between The Over-Giver and The Overthinker, so here's what that combination looks like.",
-      body: [
-      "Your block: You research every angle and carry every load, so you never have to sit in the discomfort of not knowing or not being enough.",
-      "You're the one who does the work AND thinks it to death first. You show up for everyone, and you make sure you've got every answer lined up before you move. Somewhere along the way, \"figuring it all out\" became the same thing as \"keeping everyone safe,\" including you.",
-      "The truth is, you don't need more information and you don't need to carry more weight. You need to let one thing be imperfect and unfinished, and still trust that you're enough."
-    ]},
-    es: { title: "La que todo lo piensa y todo lo carga",
-      tienote: "Saliste empatada entre La que todo lo carga y La que lo piensa demasiado, así que aquí está lo que significa esa combinación.",
-      body: [
-      "Tu bloqueo: investigas cada detalle y cargas con todo, para nunca tener que sentir la incomodidad de no saber o no ser suficiente.",
-      "Eres la que hace todo Y le da mil vueltas antes de moverse. Apareces por todos, y te aseguras de tener cada respuesta lista antes de dar un paso. En algún momento, \"tenerlo todo resuelto\" se volvió lo mismo que \"mantener a todos a salvo,\" incluyéndote a ti.",
-      "La verdad es que no necesitas más información ni cargar con más peso. Necesitas dejar que una sola cosa quede imperfecta, sin terminar, y aun así confiar en que eres suficiente."
-    ]}
+  retreater: {
+    name: `The Retreater`,
+    statement: `"I need time to think things through on my own before I'm ready to respond."`,
+    headline: `You feel safest when you have enough time, space, and information to handle things yourself.`,
+    body: [
+      `Before you try something new, you research it. Then research a little more. When someone asks you something important, you'd rather say "let me think about it" than answer on the spot.`,
+      `A packed calendar drains you before it even starts. And when someone expects something from you that you didn't plan for, you quietly pull back.`,
+      `But while you're getting ready, life keeps moving. And the people closest to you can feel like you're somewhere they can't reach.`
+    ],
+    goal: `The goal isn't to stop needing space. It's learning to tell the difference between taking space and keeping your distance.`,
+    practice: {
+      steps: `Put both feet flat on the floor and press down, so you feel the ground holding you. Sit up tall and let your chest open a little. Stay there for 5 slow breaths, and on every exhale tell yourself: "I don't need to know everything to show up."`,
+      notice: `Then notice. Did your body settle, or brace? Did your mind start listing what you still need to figure out? Did "show up" make you want to pull back?`,
+      close: `Don't analyze it. Just notice.`
+    }
   },
-  overgiver_drifter: {
-    en: { title: "The Comfortable Fixer",
-      tienote: "You scored equally between The Over-Giver and The Drifter, so here's what that combination looks like.",
-      body: [
-      "Your block: You stay busy taking care of everyone else so you never have to sit still with what you actually want.",
-      "You handle things. You show up. And somewhere between all that doing, checking out became your reward for being so \"on\" for everyone else. It's easier to keep fixing other people's lives than to face the parts of yours that feel stuck.",
-      "You don't need to do less for people or numb out less completely, you need one honest hour where nobody needs anything from you, and neither does the scroll."
-    ]},
-    es: { title: "La solucionadora cómoda",
-      tienote: "Saliste empatada entre La que todo lo carga y La que se distrae, así que aquí está lo que significa esa combinación.",
-      body: [
-      "Tu bloqueo: te mantienes ocupada resolviéndole la vida a todos para nunca tener que sentarte con lo que en realidad quieres.",
-      "Resuelves todo. Apareces por todos. Y entre tanto hacer, desconectarte se volvió tu premio por estar tan disponible para los demás. Es más fácil seguir arreglando la vida de otros que enfrentar las partes de la tuya que se sienten estancadas.",
-      "No necesitas hacer menos por los demás ni entumecerte por completo, necesitas una hora honesta donde nadie necesite nada de ti, ni siquiera el scroll."
-    ]}
+  worrier: {
+    name: `The Worrier`,
+    statement: `"Even when things are going well, part of me is waiting for something to go wrong."`,
+    headline: `When things go well, you don't relax. You get ready.`,
+    body: [
+      `Good news comes, and your first thought is "okay, but what if..." You have a plan B. And a plan C. You reread a text three times to figure out if they're upset with you.`,
+      `People tell you that you worry too much. You think: well, someone has to.`,
+      `But you're so busy preparing for the worst that you can't enjoy the good while it's actually here.`
+    ],
+    goal: `The goal isn't to stop being prepared. It's learning to tell the difference between being prepared and being braced.`,
+    practice: {
+      steps: `Name one thing that's going well right now. Then breathe in for 4 counts and out slowly for 6 to 8. Do this 5 times, and on every exhale tell yourself: "Right now, I'm okay."`,
+      notice: `Then notice. Did your mind jump to "but"? Did your shoulders drop, or stay up by your ears? Did relaxing feel a little irresponsible?`,
+      close: `Don't argue with it. Just notice.`
+    }
   },
-  overthinker_drifter: {
-    en: { title: "The Distracted Overthinker",
-      tienote: "You scored equally between The Overthinker and The Drifter, so here's what that combination looks like.",
-      body: [
-      "Your block: You stay in your head or you check out, whichever one keeps you from actually having to try.",
-      "Research feels productive. Distraction feels harmless. Both let you avoid the same thing, taking one real, imperfect step toward what you actually want. You tell yourself you're still deciding, still not sure, still not ready. Some days that's true. Most days it's just the safest lie you tell yourself.",
-      "You don't need more clarity and you don't need a bigger distraction. You need one small, uncomfortable action, today, before you've fully thought it through."
-    ]},
-    es: { title: "La que se distrae pensando",
-      tienote: "Saliste empatada entre La que lo piensa demasiado y La que se distrae, así que aquí está lo que significa esa combinación.",
-      body: [
-      "Tu bloqueo: te quedas en tu cabeza o te desconectas, lo que sea que te libre de intentarlo de verdad.",
-      "Investigar se siente productivo. Distraerte se siente inofensivo. Las dos cosas te libran de lo mismo, dar un paso real e imperfecto hacia lo que en verdad quieres. Te dices que todavía lo estás decidiendo, que todavía no estás segura, que todavía no es momento. Algunos días es cierto. La mayoría de los días es solo la mentira más cómoda que te cuentas.",
-      "No necesitas más claridad ni una distracción más grande. Necesitas una acción pequeña e incómoda, hoy, antes de que la pienses del todo."
-    ]}
+  escaper: {
+    name: `The Escaper`,
+    statement: `"When life gets heavy, I'd rather focus on something exciting than dwell on it."`,
+    headline: `You're the fun one. The positive one. The one with a plan. But when life gets uncomfortable, staying with it isn't exactly your favorite thing.`,
+    body: [
+      `When something gets hard, you're already thinking about the trip, the new project, the next good thing. Your calendar is full and your ideas never run out. People love your energy.`,
+      `When a friend wants to talk about something heavy, you catch yourself looking for the silver lining a little too fast.`,
+      `But the feelings you skip don't disappear. They wait. That's why slow days make you so restless.`
+    ],
+    goal: `The goal isn't to be less positive. It's learning to tell the difference between looking on the bright side and looking away.`,
+    practice: {
+      steps: `Sit still. No phone, no music. Breathe in for 4 counts, then out slowly for 6 to 8. Do this 5 times, and on every exhale tell yourself: "I can stay here."`,
+      notice: `Then notice. Did you get restless? Did your mind start making plans? Did a feeling you've been skipping show up?`,
+      close: `Don't run from it. Just notice.`
+    }
+  },
+  protector: {
+    name: `The Protector`,
+    statement: `"I hate feeling like someone else has power over me."`,
+    headline: `You're the strong one. Honestly, it's just easier that way.`,
+    body: [
+      `When something goes wrong, you're the one who steps up while everyone else is still figuring it out. You hate feeling like someone else has power over you, whether it's a boss, a partner, or a situation.`,
+      `You protect the people you love fiercely. You just don't let many people protect you.`,
+      `Everyone sees the strength. Almost no one sees the rest. And carrying that alone gets heavy.`
+    ],
+    goal: `The goal isn't to become soft. It's learning to tell the difference between "I can handle it" and "I have to handle it alone."`,
+    practice: {
+      steps: `Unclench your jaw. Drop your shoulders. Rest your hands on your knees, palms up. Stay there for 5 slow breaths, and on every exhale tell yourself: "I can let something in."`,
+      notice: `Then notice. Did open hands feel awkward? Did your body want to close back up? Did you almost skip this exercise?`,
+      close: `Don't push through it. Just notice.`
+    }
+  },
+  peacekeeper: {
+    name: `The Peacekeeper`,
+    statement: `"When someone asks what I want, I often honestly don't know, so I go with what they want."`,
+    headline: `You're easy to be around. Maybe so easy that even you forget to check what you want.`,
+    body: [
+      `"Where do you want to eat?" "I don't care, whatever you want."`,
+      `You can see every side of an argument. When something bothers you, you tell yourself it's not a big deal. The days blend together, and you get to the end of the week wondering where the time went.`,
+      `But when you always go with the flow, you end up living someone else's plan.`
+    ],
+    goal: `The goal isn't to start fights. It's learning to tell the difference between being easygoing and disappearing.`,
+    practice: {
+      steps: `Think of one small decision coming up today. Dinner, a show, how to spend an hour. Instead of "I don't care," say out loud: "I'd like ___." Fill in the blank, even if you end up going with someone else's choice anyway.`,
+      notice: `Then notice. Was it blank at first? Did you start thinking about what someone else would want? Did saying it out loud feel like too much?`,
+      close: `Don't talk yourself out of it. Just notice.`
+    }
   }
 };
 
 /* ---------------------------------------------------------
    STATE
 --------------------------------------------------------- */
-let lang = 'en';
+let order = [];          // shuffled pattern keys, one statement per screen
+let ratings = {};        // key -> 1..5
 let currentQ = 0;
-let userAnswers = new Array(QUESTIONS.length).fill(null); // stores 0/1/2 per question (original type index, not display position)
-let questionOrder = []; // per-question array mapping display position -> original answer index
-let userName = '';
-let userEmail = '';
+let userName = "";
+let userEmail = "";
+let topKey = null;
+let runnerKey = null;
 
-function shuffledIndices() {
-  const arr = [0, 1, 2];
-  for (let i = arr.length - 1; i > 0; i--) {
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
+    [a[i], a[j]] = [a[j], a[i]];
   }
-  return arr;
+  return a;
 }
 
-/* ---------------------------------------------------------
-   LANGUAGE
---------------------------------------------------------- */
-function setLang(l) {
-  lang = l;
-  document.getElementById('lang-en').classList.toggle('active', l === 'en');
-  document.getElementById('lang-es').classList.toggle('active', l === 'es');
-  document.documentElement.lang = l;
-  applyStaticI18n();
-  if (document.getElementById('screen-quiz').classList.contains('active')) {
-    renderQuestion();
-  }
-}
-
-function applyStaticI18n() {
-  document.querySelectorAll('[data-i18n]').forEach(el => {
-    const key = el.getAttribute('data-i18n');
-    if (I18N[lang][key]) el.textContent = I18N[lang][key];
-  });
-}
-
-/* ---------------------------------------------------------
-   SCREEN NAV
---------------------------------------------------------- */
 function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  document.getElementById('topbar').classList.toggle('hidden', id !== 'screen-intro');
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  window.scrollTo(0, 0);
 }
 
 /* ---------------------------------------------------------
-   INTRO -> START QUIZ
+   INTRO
 --------------------------------------------------------- */
 function startQuiz() {
-  const nameVal = document.getElementById('input-name').value.trim();
-  const emailVal = document.getElementById('input-email').value.trim();
+  const nameVal = document.getElementById("input-name").value.trim();
+  const emailVal = document.getElementById("input-email").value.trim();
   const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal);
 
   if (!nameVal || !emailOk) {
-    document.getElementById('intro-error').style.display = 'block';
+    document.getElementById("intro-error").style.display = "block";
     return;
   }
-  document.getElementById('intro-error').style.display = 'none';
+  document.getElementById("intro-error").style.display = "none";
 
   userName = nameVal;
   userEmail = emailVal;
+  if (typeof fbq === "function") fbq("track", "Lead");
 
-  if (typeof fbq === 'function') fbq('track', 'Lead');
-
+  order = shuffle(PATTERN_KEYS);
+  ratings = {};
   currentQ = 0;
-  userAnswers = new Array(QUESTIONS.length).fill(null);
-  questionOrder = QUESTIONS.map(() => shuffledIndices());
-  showScreen('screen-quiz');
-  renderQuestion();
+  showScreen("screen-quiz");
+  renderStatement();
 }
 
 /* ---------------------------------------------------------
-   QUIZ RENDERING
+   RATING SCREENS
 --------------------------------------------------------- */
-function renderQuestion() {
-  const q = QUESTIONS[currentQ][lang];
-  document.getElementById('progress-fill').style.width = ((currentQ) / QUESTIONS.length * 100) + '%';
-  document.getElementById('q-count').textContent =
-    (lang === 'en' ? 'Question ' : 'Pregunta ') + (currentQ + 1) + (lang === 'en' ? ' of ' : ' de ') + QUESTIONS.length;
-  document.getElementById('q-text').textContent = q.q;
+function renderStatement() {
+  const key = order[currentQ];
+  document.getElementById("progress-fill").style.width = (currentQ / order.length * 100) + "%";
+  document.getElementById("q-count").textContent = "Statement " + (currentQ + 1) + " of " + order.length;
+  document.getElementById("q-progress").textContent = (currentQ + 1) + " of " + order.length;
+  document.getElementById("statement").textContent = PATTERNS[key].statement;
 
-  const answersDiv = document.getElementById('answers');
-  answersDiv.innerHTML = '';
-  const order = questionOrder[currentQ] || [0, 1, 2];
-  order.forEach(idx => {
-    const btn = document.createElement('button');
-    btn.className = 'answer-btn';
-    btn.textContent = q.a[idx];
-    if (userAnswers[currentQ] === idx) btn.classList.add('selected');
-    btn.onclick = () => selectAnswer(idx);
-    answersDiv.appendChild(btn);
-  });
-
-  document.getElementById('btn-back').disabled = (currentQ === 0);
+  const scale = document.getElementById("scale");
+  scale.innerHTML = "";
+  for (let n = 1; n <= 5; n++) {
+    const btn = document.createElement("button");
+    btn.className = "scale-btn";
+    btn.textContent = n;
+    btn.setAttribute("aria-label", "Rate " + n + " out of 5");
+    if (ratings[key] === n) btn.classList.add("selected");
+    btn.onclick = () => rate(n);
+    scale.appendChild(btn);
+  }
+  document.getElementById("btn-back").disabled = (currentQ === 0);
 }
 
-function selectAnswer(idx) {
-  userAnswers[currentQ] = idx;
-  renderQuestion();
+function rate(n) {
+  ratings[order[currentQ]] = n;
+  renderStatement();
   setTimeout(() => {
-    if (currentQ < QUESTIONS.length - 1) {
+    if (currentQ < order.length - 1) {
       currentQ++;
-      renderQuestion();
+      renderStatement();
     } else {
-      finishQuiz();
+      document.getElementById("progress-fill").style.width = "100%";
+      resolveResult();
     }
   }, 220);
 }
@@ -703,99 +815,155 @@ function selectAnswer(idx) {
 function goBack() {
   if (currentQ > 0) {
     currentQ--;
-    renderQuestion();
+    renderStatement();
   }
 }
 
 /* ---------------------------------------------------------
-   SCORING
+   SCORING + TIE-BREAKERS
+   Highest rating = loudest pattern. Ties go to a gut-check screen.
+   Runner-up = next highest, with its own gut check if tied.
 --------------------------------------------------------- */
-function computeResultKey() {
-  const counts = { overgiver: 0, overthinker: 0, drifter: 0 };
-  const idxToType = ['overgiver', 'overthinker', 'drifter'];
-  userAnswers.forEach(idx => { counts[idxToType[idx]]++; });
+function scoreGroups(keys) {
+  const byScore = {};
+  keys.forEach(k => {
+    const s = ratings[k];
+    (byScore[s] = byScore[s] || []).push(k);
+  });
+  return Object.keys(byScore).map(Number).sort((a, b) => b - a).map(s => byScore[s]);
+}
 
-  const max = Math.max(counts.overgiver, counts.overthinker, counts.drifter);
-  const winners = TYPE_ORDER.filter(t => counts[t] === max);
+function resolveResult() {
+  const groups = scoreGroups(PATTERN_KEYS);
+  const top = groups[0];
 
-  if (winners.length === 1) return winners[0];
-  if (winners.length === 2) return winners.join('_');
-  // 3-way tie fallback
-  return 'overgiver_overthinker';
+  if (top.length === 1) {
+    topKey = top[0];
+    resolveRunner(groups[1] || []);
+  } else {
+    askTie(top, "Which of these sounds more like you?", "A few of these came out even. Go with your gut.", pick => {
+      topKey = pick;
+      resolveRunner(top.filter(k => k !== pick));
+    });
+  }
+}
+
+function resolveRunner(candidates) {
+  if (candidates.length === 1) {
+    runnerKey = candidates[0];
+    finish();
+  } else {
+    askTie(candidates, "And which of these comes next?", "One more gut check, then your result.", pick => {
+      runnerKey = pick;
+      finish();
+    });
+  }
+}
+
+function askTie(keys, title, sub, onPick) {
+  document.getElementById("tie-title").textContent = title;
+  document.getElementById("tie-sub").textContent = sub;
+  const box = document.getElementById("tie-options");
+  box.innerHTML = "";
+  shuffle(keys).forEach(k => {
+    const btn = document.createElement("button");
+    btn.className = "tie-btn";
+    btn.textContent = PATTERNS[k].statement;
+    btn.onclick = () => onPick(k);
+    box.appendChild(btn);
+  });
+  showScreen("screen-tie");
 }
 
 /* ---------------------------------------------------------
-   FINISH -> RESULT
+   FINISH: emails + result
 --------------------------------------------------------- */
-function finishQuiz() {
-  document.getElementById('progress-fill').style.width = '100%';
-  showScreen('screen-loading');
+function buildEmailMessage() {
+  const p = PATTERNS[topKey];
+  const r = PATTERNS[runnerKey];
+  return [
+    "Your loudest pattern: " + p.name,
+    "Close behind: " + r.name,
+    "",
+    p.headline,
+    "",
+    p.body.join("\n\n"),
+    "",
+    p.goal,
+    "",
+    "TRY THIS FOR 2 MINUTES",
+    p.practice.steps,
+    "",
+    p.practice.notice,
+    "",
+    p.practice.close,
+    "",
+    "This is a pattern, not your personality. Your pattern shows you what you do. Your Enneagram type, the deeper personality pattern underneath, shows you why.",
+    "Discover your Enneagram Profile: " + PROFILE_URL
+  ].join("\n");
+}
 
-  const resultKey = computeResultKey();
+function finish() {
+  showScreen("screen-loading");
+  if (typeof fbq === "function") fbq("track", "CompleteRegistration");
 
-  if (typeof fbq === 'function') fbq('track', 'CompleteRegistration');
+  const resultLabel = PATTERNS[topKey].name + " (close behind: " + PATTERNS[runnerKey].name + ")";
 
-  const r = RESULTS[resultKey][lang];
-  const fullMessage = (r.tienote ? r.tienote + '\n\n' : '') + r.body.join('\n\n');
-
-  // Notify Mariana via EmailJS (fire and forget)
-  if (EMAILJS_NOTIFY_TEMPLATE_ID && EMAILJS_NOTIFY_TEMPLATE_ID !== 'REPLACE_WITH_NEW_TEMPLATE_ID') {
+  try {
+  // Notify Mariana (same template variables as before)
     emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_NOTIFY_TEMPLATE_ID, {
       quiz_taker_name: userName,
       quiz_taker_email: userEmail,
-      result_type: r.title,
-      quiz_language: lang === 'en' ? 'English' : 'Español'
-    }).catch(err => console.error('EmailJS notify failed:', err));
-  }
+      result_type: resultLabel,
+      quiz_language: "English"
+    }).catch(err => console.error("EmailJS notify failed:", err));
 
-  // Auto-reply to the quiz taker with their own result (fire and forget)
-  if (EMAILJS_AUTOREPLY_TEMPLATE_ID && EMAILJS_AUTOREPLY_TEMPLATE_ID !== 'REPLACE_WITH_AUTOREPLY_TEMPLATE_ID') {
-    const phrases = EMAIL_PHRASES[lang];
+    // Send the quiz taker her result (same template variables as before)
     emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_AUTOREPLY_TEMPLATE_ID, {
       to_email: userEmail,
       taker_name: userName,
-      result_title: r.title,
-      result_message: fullMessage,
-      greeting: phrases.greeting,
-      result_intro: phrases.resultIntro,
-      signoff: phrases.signoff
-    }).catch(err => console.error('EmailJS autoreply failed:', err));
-  }
+      result_title: PATTERNS[topKey].name,
+      result_message: buildEmailMessage(),
+      greeting: "Hi",
+      result_intro: "Here's your result:",
+      signoff: "With love,"
+    }).catch(err => console.error("EmailJS autoreply failed:", err));
 
-  setTimeout(() => renderResult(resultKey), 600);
+  } catch (e) { console.warn("Emails skipped:", e); }
+
+  setTimeout(renderResult, 700);
 }
 
-function renderResult(resultKey) {
-  const r = RESULTS[resultKey][lang];
+function renderResult() {
+  const p = PATTERNS[topKey];
+  const r = PATTERNS[runnerKey];
 
-  const tienoteEl = document.getElementById('result-tienote');
-  if (r.tienote) {
-    tienoteEl.textContent = r.tienote;
-    tienoteEl.style.display = 'block';
-  } else {
-    tienoteEl.style.display = 'none';
-  }
+  document.getElementById("result-name").textContent = userName + "'s result";
+  document.getElementById("result-title").textContent = p.name;
+  document.getElementById("result-headline").textContent = p.headline;
 
-  document.getElementById('result-title').textContent = r.title;
-
-  const bodyDiv = document.getElementById('result-body');
-  bodyDiv.innerHTML = '';
-  r.body.forEach((para, i) => {
-    const p = document.createElement('p');
-    if (i === 0) {
-      p.className = 'block-label';
-    }
-    p.textContent = para;
-    bodyDiv.appendChild(p);
+  const body = document.getElementById("result-body");
+  body.innerHTML = "";
+  p.body.concat([p.goal]).forEach((text, i, arr) => {
+    const el = document.createElement("p");
+    el.textContent = text;
+    if (i === arr.length - 1) el.className = "goal";
+    body.appendChild(el);
   });
 
-  showScreen('screen-result');
+  document.getElementById("practice-steps").textContent = p.practice.steps;
+  document.getElementById("practice-notice").textContent = p.practice.notice;
+  document.getElementById("practice-close").textContent = p.practice.close;
+
+  document.getElementById("ru-name").textContent = r.name;
+  document.getElementById("ru-headline").textContent = r.headline;
+
+  showScreen("screen-result");
 }
 
-/* ---------------------------------------------------------
-   INIT
---------------------------------------------------------- */
-applyStaticI18n();
+function trackProfileClick() {
+  if (typeof fbq === "function") fbq("track", "ViewContent", { content_name: "Enneagram Profile" });
+}
 </script>
 
 </body>
