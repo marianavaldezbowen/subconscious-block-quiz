@@ -51,6 +51,8 @@
     flex-direction: column;
   }
 
+  h1:focus, h2:focus { outline: none; }
+
   button:focus-visible, a:focus-visible, input:focus-visible {
     outline: 2px solid var(--terra);
     outline-offset: 2px;
@@ -130,6 +132,7 @@
   .meta-value { font-size: 16px; color: var(--charcoal); }
 
   .intake-form {
+    position: relative;
     background: var(--page-lift);
     border: 1px solid var(--rule);
     padding: 28px;
@@ -416,6 +419,47 @@
     margin-top: 32px;
   }
 
+
+  .btn-secondary {
+    display: inline-block;
+    background: transparent;
+    color: var(--charcoal);
+    border: 1.5px solid var(--rule);
+    border-radius: 8px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    padding: 13px 26px;
+    cursor: pointer;
+  }
+
+  .btn-secondary:hover { border-color: var(--charcoal); }
+
+  .save-row { margin-top: 28px; }
+  .print-only { display: none; }
+
+  .print-help {
+    display: none;
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: var(--charcoal);
+    background: var(--terra-bg);
+    border: 1px solid var(--terra-light);
+    border-left: 4px solid var(--terra);
+    padding: 14px 16px;
+    margin-top: 14px;
+  }
+
+  @media print {
+    .btn-primary, .btn-secondary, .save-row, .print-help, .email-notice { display: none !important; }
+    .print-only { display: block !important; font-weight: 600; margin: 0 !important; }
+    body, .result-header { background: #fff !important; }
+    .result-header { padding: 20px 0 16px; }
+    .result-content { padding: 24px 0 0; max-width: 100%; }
+    .practice, .panel, .bridge, .result-body p { break-inside: avoid; page-break-inside: avoid; }
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
   }
@@ -447,16 +491,19 @@
         <div><span class="meta-label">Result</span><span class="meta-value">Your loudest pattern</span></div>
       </div>
 
-      <div class="intake-form">
+      <form class="intake-form" onsubmit="event.preventDefault(); startQuiz();">
         <p class="intake-why">First, where should I send your result?</p>
         <label for="input-name">Your first name</label>
-        <input type="text" id="input-name" placeholder="e.g. Sofia" autocomplete="given-name">
+        <input type="text" id="input-name" placeholder="e.g. Sofia" autocomplete="given-name" autocapitalize="words" autocorrect="off">
         <label for="input-email">Your email address</label>
         <input type="email" id="input-email" placeholder="sofia@example.com" autocomplete="email">
         <div class="error-msg" id="intro-error" role="alert" aria-live="polite">Please enter your first name and a valid email.</div>
-      </div>
-
-      <button class="btn-primary" onclick="startQuiz()">Find my pattern</button>
+        <!-- Honeypot: invisible to people, bots fill it in -->
+        <div style="position:absolute;left:-9999px;" aria-hidden="true">
+          <input type="text" id="intake-hp" name="website" tabindex="-1" autocomplete="off">
+        </div>
+        <button type="submit" class="btn-primary" style="margin-top:4px;">Find my pattern</button>
+      </form>
     </div>
   </div>
 
@@ -477,7 +524,7 @@
       <div class="question-card">
         <span class="q-count" id="q-count">Statement 1 of 9</span>
         <div class="statement" id="statement"></div>
-        <div class="scale" id="scale"></div>
+        <div class="scale" id="scale" role="group" aria-label="Rate from 1, not me at all, to 5, this is me"></div>
         <div class="scale-labels">
           <span>Not me at all</span>
           <span>Sometimes</span>
@@ -539,6 +586,12 @@
         <h3>This is a pattern, not your personality.</h3>
         <p>Your pattern shows you what you do. Your Enneagram type, the deeper personality pattern underneath, shows you why. Your Enneagram Profile goes deeper into your likely type, your core motivations, your blind spots, and how your top two patterns shape the way you work, love, and make decisions.</p>
         <a class="btn-primary" id="profile-cta" href="https://marianavaldez.com/#profile" target="_blank" rel="noopener" onclick="trackProfileClick()">Discover my Enneagram Profile - $27</a>
+        <p class="print-only">Discover your Enneagram Profile at marianavaldez.com/#profile</p>
+      </div>
+
+      <div class="save-row">
+        <button class="btn-secondary" onclick="saveResultPdf()">Save my result as a PDF</button>
+        <p class="print-help" id="print-help"></p>
       </div>
 
       <div class="email-notice">
@@ -745,14 +798,20 @@ function shuffle(arr) {
 
 function showScreen(id) {
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
+  const screen = document.getElementById(id);
+  screen.classList.add("active");
   window.scrollTo(0, 0);
+  // Move keyboard and screen-reader focus to the new screen's heading
+  const heading = screen.querySelector("h1, h2");
+  if (heading) { heading.setAttribute("tabindex", "-1"); heading.focus({ preventScroll: true }); }
 }
 
 /* ---------------------------------------------------------
    INTRO
 --------------------------------------------------------- */
 function startQuiz() {
+  const hp = document.getElementById("intake-hp");
+  if (hp && hp.value) return; // bot
   const nameVal = document.getElementById("input-name").value.trim();
   const emailVal = document.getElementById("input-email").value.trim();
   const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal);
@@ -767,6 +826,7 @@ function startQuiz() {
   userEmail = emailVal;
   if (typeof fbq === "function") fbq("track", "Lead");
 
+  finished = false;
   order = shuffle(PATTERN_KEYS);
   ratings = {};
   currentQ = 0;
@@ -791,6 +851,7 @@ function renderStatement() {
     btn.className = "scale-btn";
     btn.textContent = n;
     btn.setAttribute("aria-label", "Rate " + n + " out of 5");
+    btn.setAttribute("aria-pressed", ratings[key] === n ? "true" : "false");
     if (ratings[key] === n) btn.classList.add("selected");
     btn.onclick = () => rate(n);
     scale.appendChild(btn);
@@ -798,10 +859,15 @@ function renderStatement() {
   document.getElementById("btn-back").disabled = (currentQ === 0);
 }
 
+let isTransitioning = false;
+
 function rate(n) {
+  if (isTransitioning) return;
+  isTransitioning = true;
   ratings[order[currentQ]] = n;
   renderStatement();
   setTimeout(() => {
+    isTransitioning = false;
     if (currentQ < order.length - 1) {
       currentQ++;
       renderStatement();
@@ -813,6 +879,7 @@ function rate(n) {
 }
 
 function goBack() {
+  if (isTransitioning) return;
   if (currentQ > 0) {
     currentQ--;
     renderStatement();
@@ -849,6 +916,11 @@ function resolveResult() {
 }
 
 function resolveRunner(candidates) {
+  // Defensive only: with 9 patterns this list can't be empty, but if the
+  // statements ever change, fall back to every other pattern.
+  if (!candidates || candidates.length === 0) {
+    candidates = PATTERN_KEYS.filter(k => k !== topKey);
+  }
   if (candidates.length === 1) {
     runnerKey = candidates[0];
     finish();
@@ -869,7 +941,10 @@ function askTie(keys, title, sub, onPick) {
     const btn = document.createElement("button");
     btn.className = "tie-btn";
     btn.textContent = PATTERNS[k].statement;
-    btn.onclick = () => onPick(k);
+    btn.onclick = () => {
+      box.querySelectorAll("button").forEach(b => b.disabled = true);
+      onPick(k);
+    };
     box.appendChild(btn);
   });
   showScreen("screen-tie");
@@ -879,31 +954,46 @@ function askTie(keys, title, sub, onPick) {
    FINISH: emails + result
 --------------------------------------------------------- */
 function buildEmailMessage() {
+  // A shorter version of the result page, built to scan: the headline, the
+  // one shift, the practice with its questions as bullets, and the next step.
+  // The full write-up lives on the result page and in the PDF.
+  // The EmailJS template must use triple braces {{{result_message}}}.
   const p = PATTERNS[topKey];
   const r = PATTERNS[runnerKey];
+  const ink = "color:#1E2124;font-size:16px;line-height:1.7;";
+  const para = (t, extra) => '<p style="margin:0 0 16px;' + ink + (extra || "") + '">' + t + "</p>";
+  const label = t => '<p style="margin:0 0 6px;font-size:13px;font-weight:bold;color:#3F4B2F;">' + t + "</p>";
+  const matched = p.practice.notice.replace(/^Then notice\.\s*/, "").match(/[^?]+\?/g);
+  const questions = (matched && matched.length ? matched : [p.practice.notice.replace(/^Then notice\.\s*/, "")])
+    .map(q => '<li style="margin:0 0 6px;' + ink + '">' + q.trim() + "</li>").join("");
+
   return [
-    "Your loudest pattern: " + p.name,
-    "Close behind: " + r.name,
-    "",
-    p.headline,
-    "",
-    p.body.join("\n\n"),
-    "",
-    p.goal,
-    "",
-    "TRY THIS FOR 2 MINUTES",
-    p.practice.steps,
-    "",
-    p.practice.notice,
-    "",
-    p.practice.close,
-    "",
-    "This is a pattern, not your personality. Your pattern shows you what you do. Your Enneagram type, the deeper personality pattern underneath, shows you why.",
-    "Discover your Enneagram Profile: " + PROFILE_URL
-  ].join("\n");
+    para('<span style="font-size:20px;line-height:1.4;"><strong>' + p.headline + "</strong></span>"),
+    para("Close behind: <strong>" + r.name + "</strong>", "color:#3D4045;"),
+
+    '<div style="border-top:1px solid #DCDAD4;margin:24px 0;"></div>',
+    label("THE SHIFT"),
+    para(p.goal.replace(/^The goal isn't [^.]+\.\s*/, "It's not about changing who you are. ").replace("It's not about changing who you are. It's learning", "It's learning")),
+
+    '<div style="background:#EDF0E9;border-left:3px solid #3F4B2F;padding:20px 22px;margin:24px 0;">',
+      label("TRY THIS FOR 2 MINUTES"),
+      para(p.practice.steps),
+      para("Then notice:", "margin-bottom:6px;"),
+      '<ul style="margin:0 0 16px;padding-left:20px;">' + questions + "</ul>",
+      '<p style="margin:0;' + ink + '"><strong>' + p.practice.close + "</strong></p>",
+    "</div>",
+
+    label("WANT TO GO DEEPER?"),
+    para("This is a pattern, not your personality. Your Enneagram type, the deeper personality pattern underneath, shows you why you do it. My Enneagram Profile is a much more in-depth report on the patterns you're carrying, with a personalized 14-day plan to start shifting them."),
+    '<p style="margin:8px 0 8px;"><a href="' + PROFILE_URL + '" style="display:inline-block;background:#BC6A4C;color:#ffffff;text-decoration:none;padding:14px 26px;border-radius:8px;font-size:15px;">Discover my Enneagram Profile - $27</a></p>'
+  ].join("");
 }
 
+let finished = false;
+
 function finish() {
+  if (finished) return; // never send the emails twice
+  finished = true;
   showScreen("screen-loading");
   if (typeof fbq === "function") fbq("track", "CompleteRegistration");
 
@@ -959,6 +1049,42 @@ function renderResult() {
   document.getElementById("ru-headline").textContent = r.headline;
 
   showScreen("screen-result");
+}
+
+
+/* ---------------------------------------------------------
+   SAVE AS PDF
+   Uses the browser's own print-to-PDF, same approach as the
+   Enneagram Profile. Instagram's in-app browser can't do this,
+   and most quiz traffic comes from Instagram, so it says so.
+--------------------------------------------------------- */
+function isInAppBrowser() {
+  const ua = navigator.userAgent || "";
+  return /Instagram|FBAN|FBAV|FB_IAB|Line\/|Twitter|Snapchat|Pinterest|LinkedInApp|TikTok|musical_ly|BytedanceWebview/i.test(ua);
+}
+
+function isIOS() {
+  return /iPad|iPhone|iPod/.test(navigator.userAgent || "")
+      || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+}
+
+async function saveResultPdf() {
+  const note = document.getElementById("print-help");
+  if (isInAppBrowser()) {
+    note.innerHTML = "Saving a PDF doesn't work inside the Instagram or TikTok browser. "
+      + "Tap the <strong>&hellip;</strong> menu at the top and choose <strong>Open in browser</strong>, then try again. "
+      + "Your result is also in your inbox, so nothing is lost.";
+    note.style.display = "block";
+    return;
+  }
+  if (isIOS()) {
+    note.innerHTML = "In the share sheet that opens, choose <strong>Print</strong>, then pinch outwards on the preview and tap the share icon to save it to Files.";
+    note.style.display = "block";
+  }
+  // The browser uses the page title as the file name
+  document.title = "My Pattern - " + PATTERNS[topKey].name;
+  try { if (document.fonts && document.fonts.ready) await document.fonts.ready; } catch (e) {}
+  window.print();
 }
 
 function trackProfileClick() {
