@@ -498,10 +498,6 @@
         <label for="input-email">Your email address</label>
         <input type="email" id="input-email" placeholder="sofia@example.com" autocomplete="email">
         <div class="error-msg" id="intro-error" role="alert" aria-live="polite">Please enter your first name and a valid email.</div>
-        <!-- Honeypot: invisible to people, bots fill it in -->
-        <div style="position:absolute;left:-9999px;" aria-hidden="true">
-          <input type="text" id="intake-hp" name="website" tabindex="-1" autocomplete="off">
-        </div>
         <button type="submit" class="btn-primary" style="margin-top:4px;">Find my pattern</button>
       </form>
     </div>
@@ -810,8 +806,6 @@ function showScreen(id) {
    INTRO
 --------------------------------------------------------- */
 function startQuiz() {
-  const hp = document.getElementById("intake-hp");
-  if (hp && hp.value) return; // bot
   const nameVal = document.getElementById("input-name").value.trim();
   const emailVal = document.getElementById("input-email").value.trim();
   const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal);
@@ -973,7 +967,8 @@ function buildEmailMessage() {
 
     '<div style="border-top:1px solid #DCDAD4;margin:24px 0;"></div>',
     label("THE SHIFT"),
-    para(p.goal.replace(/^The goal isn't [^.]+\.\s*/, "It's not about changing who you are. ").replace("It's not about changing who you are. It's learning", "It's learning")),
+    // Keep only the second sentence of the goal ("It's learning to tell the difference...")
+    para(p.goal.split(/\.\s+(?=It's)/)[1] || p.goal),
 
     '<div style="background:#EDF0E9;border-left:3px solid #3F4B2F;padding:20px 22px;margin:24px 0;">',
       label("TRY THIS FOR 2 MINUTES"),
